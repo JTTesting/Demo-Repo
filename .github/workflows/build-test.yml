@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,7 +38,7 @@ jobs:
       # create your own step of adding it to the job summary. I am
       # intentionally doing that to show job summaries
       - name: Create test summary
-        uses: test-summary/action@v2.4
+        uses: test-summary/action@v2
         with:
           paths: ${{ github.workspace }}/results/*.xml
           output: ${{ github.workspace }}/results/summary.md
