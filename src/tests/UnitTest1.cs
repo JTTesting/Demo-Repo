@@ -34,7 +34,7 @@ namespace MyGithubActionsPresentation.Tests
     {
       Assert.IsTrue(false);
     }
-*/
+
     [TestMethod]
     public void Test6Passes()
     {
