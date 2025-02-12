@@ -22,7 +22,7 @@ namespace MyGithubActionsPresentation.Tests
     {
       Assert.IsTrue(true);
     }
-/*
+
     [TestMethod]
     public void Test4Fails()
     {
