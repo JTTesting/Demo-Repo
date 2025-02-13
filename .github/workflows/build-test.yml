@@ -15,6 +15,11 @@ jobs:
     runs-on: windows-2019
 
     steps:
+      - name: Dump GitHub context1
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+        
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -63,7 +68,7 @@ jobs:
           path: mywebapp/**
           if-no-files-found: error
           
-      - name: Dump GitHub context
+      - name: Dump GitHub context2
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
