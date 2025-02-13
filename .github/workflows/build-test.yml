@@ -59,6 +59,11 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{github.event.repository.name}}"
+          name: "${{github.event.repository.name}}-DEV"
           path: mywebapp/**
           if-no-files-found: error
+          
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
