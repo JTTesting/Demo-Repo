@@ -7,4 +7,10 @@
     <RootNamespace>my_web_app</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="LibDemo">
+      <HintPath>..\..\..\Libraries\LibDemo\LibDemo\bin\Debug\net8.0\LibDemo.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
