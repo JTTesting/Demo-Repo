@@ -5,9 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>my_web_app</RootNamespace>
-    <Environment Condition="'$(BUILD_ENVIRONMENT)' == ''">Local</Environment>
+    <Environment Condition="'$(BUILD_ENVIRONMENT)' == '' or '$(BUILD_ENVIRONMENT)' == null">Local</Environment>
   </PropertyGroup>
 
+  <Target Name="BeforeBuild">
+    <Message Text="BUILD_ENVIRONMENT=$(BUILD_ENVIRONMENT)" Importance="high" />
+  </Target>
 
   <!-- GitHub Build Configuration -->
   <PropertyGroup Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'">
@@ -18,9 +21,8 @@
   <PropertyGroup Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">
     <OutputPath>bin\Local\</OutputPath>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <!-- Use different references or sources based on environment -->
     <Reference Include="LibDemo">
       <HintPath Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'">../path/to/github/LibDemo.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">..\..\..\Libraries\LibDemo\LibDemo\bin\Debug\net8.0\LibDemo.dll</HintPath>
