@@ -9,6 +9,9 @@ on:
 permissions:
   id-token: write
   contents: read
+
+env:
+  BUILD_ENVIRONMENT: GitHub
   
 jobs:
   build:
