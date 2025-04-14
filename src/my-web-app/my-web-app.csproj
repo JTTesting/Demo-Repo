@@ -29,7 +29,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="LibDemo.1.0.0.nupkg" Version="1.0.0" Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'" />
     <Reference Include="LibDemo">
       <HintPath Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">..\..\..\Libraries\LibDemo\LibDemo\bin\Debug\net8.0\LibDemo.dll</HintPath>
     </Reference>
