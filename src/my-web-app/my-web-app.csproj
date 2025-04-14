@@ -5,6 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>my_web_app</RootNamespace>
+    <PackageId>my_web_app</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Jameson</Authors>
+    <Company>JTTesting</Company>
+    <PackageDescription>LibDemo</PackageDescription>
+    <RepositoryUrl>https://github.com/JTTesting/LibDemo</RepositoryUrl>
     <Environment Condition="'$(BUILD_ENVIRONMENT)' == '' or '$(BUILD_ENVIRONMENT)' == null">Local</Environment>
   </PropertyGroup>
 
