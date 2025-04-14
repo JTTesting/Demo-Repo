@@ -21,10 +21,13 @@
   <PropertyGroup Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">
     <OutputPath>bin\Local\</OutputPath>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <PackageReference Include="LibDemo.1.0.0.nupkg" Version="1.0.0" Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'" />
+  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="LibDemo">
-      <HintPath Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'">../path/to/github/LibDemo.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">..\..\..\Libraries\LibDemo\LibDemo\bin\Debug\net8.0\LibDemo.dll</HintPath>
     </Reference>
   </ItemGroup>
