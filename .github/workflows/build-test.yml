@@ -81,3 +81,6 @@ jobs:
       - name: Remove Existing NuGet Source
         run: dotnet nuget remove source GitHub || true
         if: always()
+
+      - name: List NuGet Sources
+        run: dotnet nuget list source
