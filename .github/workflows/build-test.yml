@@ -27,8 +27,8 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Add Package
-        run: dotnet add package LibDemo --version 1.0.1
+      - name: Authenticate with GitHub Packages
+        run: dotnet nuget add source https://nuget.pkg.github.com/JTTesting/index.json --name GitHub --username JamesonTM --password ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
         run: dotnet restore "${{github.workspace}}/src/my-web-app.sln"
