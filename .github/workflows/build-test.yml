@@ -26,6 +26,9 @@ jobs:
         uses: actions/setup-dotnet@v4.1.0
         with:
           dotnet-version: "8.0.x"
+          
+      - name: Authenticate with GitHub Packages
+        run: dotnet nuget add source https://nuget.pkg.github.com/JTTesting/index.json --name GitHub --username JamesonTM --password ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
         run: dotnet restore "${{github.workspace}}/src/my-web-app.sln"
