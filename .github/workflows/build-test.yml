@@ -27,6 +27,11 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Configure NuGet credentials
+        run: |
+          sed -i 's/MyName/${{ github.actor }}/g' nuget.config
+          sed -i 's/MyPAT/${{ secrets.BUILDPAT }}/g' nuget.config
+
       - name: Restore dependencies
         run: dotnet restore "${{github.workspace}}/src/my-web-app.sln" --verbosity detailed
 
