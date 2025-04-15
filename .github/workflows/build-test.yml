@@ -27,12 +27,6 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: List NuGet Sources
-        run: dotnet nuget list source
-          
-      - name: Authenticate with GitHub Packages
-        run: dotnet nuget add source https://nuget.pkg.github.com/JTTesting/index.json --name GitHub --username JamesonTM --password ${{ secrets.BUILDPAT }}
-
       - name: Restore dependencies
         run: dotnet restore "${{github.workspace}}/src/my-web-app.sln" --verbosity detailed
 
@@ -78,10 +72,3 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: Remove Existing NuGet Source
-        run: dotnet nuget remove source GitHub || true
-        if: always()
-
-      - name: List NuGet Sources
-        run: dotnet nuget list source
-        if: always()
