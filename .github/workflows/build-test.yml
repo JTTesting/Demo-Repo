@@ -28,7 +28,7 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore "${{github.workspace}}/src/my-web-app.sln"
+        run: dotnet restore "${{github.workspace}}/src/my-web-app.sln" --verbosity detailed
 
       - name: Build
         run: dotnet build "${{github.workspace}}/src/my-web-app.sln"  --no-restore --configuration Release
