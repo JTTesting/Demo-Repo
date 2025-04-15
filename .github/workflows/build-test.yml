@@ -84,3 +84,4 @@ jobs:
 
       - name: List NuGet Sources
         run: dotnet nuget list source
+        if: always()
