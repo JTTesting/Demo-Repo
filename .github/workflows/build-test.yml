@@ -30,7 +30,7 @@ jobs:
       - name: Configure NuGet credentials
         run: |
           sed -i 's/MyName/${{ github.actor }}/g' nuget.config
-          sed -i 's/MyPAT/${{ secrets.All }}/g' nuget.config
+          sed -i 's/MyPAT/${{ secrets.ALL }}/g' nuget.config
 
       - name: Restore dependencies
         run: dotnet restore "${{github.workspace}}/src/my-web-app.sln" --verbosity detailed
