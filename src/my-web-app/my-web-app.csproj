@@ -7,28 +7,10 @@
     <RootNamespace>my_web_app</RootNamespace>
     <PackageId>my_web_app</PackageId>
     <RepositoryUrl>https://github.com/JTTesting/Demo-Repo</RepositoryUrl>
-    <Environment Condition="'$(BUILD_ENVIRONMENT)' == '' or '$(BUILD_ENVIRONMENT)' == null">Local</Environment>
-  </PropertyGroup>
-
-  <Target Name="BeforeBuild">
-    <Message Text="BUILD_ENVIRONMENT=$(BUILD_ENVIRONMENT)" Importance="high" />
-  </Target>
-
-  <!-- GitHub Build Configuration -->
-  <PropertyGroup Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'">
-    <OutputPath>$(SolutionDir)artifacts/GitHub/</OutputPath>
-  </PropertyGroup>
-
-  <!-- Local Build Configuration -->
-  <PropertyGroup Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">
-    <OutputPath>bin\Local\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibDemo" Version="1.0.2" Condition="'$(BUILD_ENVIRONMENT)' == 'GitHub'" />
-    <Reference Include="LibDemo">
-      <HintPath Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">..\..\..\Libraries\LibDemo\LibDemo\bin\Debug\net8.0\LibDemo.dll</HintPath>
-    </Reference>
+    <PackageReference Include="LibDemo" Version="1.0.2" />
   </ItemGroup>
 
 </Project>
