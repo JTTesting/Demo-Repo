@@ -33,13 +33,13 @@ jobs:
           sed -i 's/MyPAT/${{ secrets.ALL }}/g' nuget.config
 
       - name: Restore dependencies
-        run: dotnet restore "${{github.workspace}}/src/my-web-app.sln" --verbosity detailed
+        run: dotnet restore "${{github.workspace}}/my-web-app.sln" --verbosity detailed
 
       - name: Build
-        run: dotnet build "${{github.workspace}}/src/my-web-app.sln"  --no-restore --configuration Release
+        run: dotnet build "${{github.workspace}}/my-web-app.sln"  --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test "${{github.workspace}}/src/my-web-app.sln" --no-restore --logger:"junit;LogFilePath=${{ github.workspace }}/results/test-results.xml"
+        run: dotnet test "${{github.workspace}}/my-web-app.sln" --no-restore --logger:"junit;LogFilePath=${{ github.workspace }}/Testresults/test-results.xml"
 
       # create a test summary markdown file
       # if you don't specify an output file, it will automatically add
@@ -49,8 +49,8 @@ jobs:
       - name: Create test summary
         uses: test-summary/action@v2.4
         with:
-          paths: ${{ github.workspace }}/results/*.xml
-          output: ${{ github.workspace }}/results/summary.md
+          paths: ${{ github.workspace }}/Testresults/*.xml
+          output: ${{ github.workspace }}/Testresults/summary.md
           show: "all"
         if: always()
 
@@ -59,11 +59,11 @@ jobs:
         run: |
           echo "TEST RESULTS:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
-          cat "${{ github.workspace }}/results/summary.md" >> $GITHUB_STEP_SUMMARY
+          cat "${{ github.workspace }}/Testresults/summary.md" >> $GITHUB_STEP_SUMMARY
         if: always()
 
       - name: Publish
-        run: dotnet publish "${{github.workspace}}/src/my-web-app/my-web-app.csproj" -c Release -o mywebapp
+        run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
