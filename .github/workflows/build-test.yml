@@ -9,7 +9,7 @@ on:
 permissions:
   id-token: write
   contents: read
-  packages: read
+  packages: write
 
 env:
   BUILD_ENVIRONMENT: GitHub
@@ -30,7 +30,7 @@ jobs:
       - name: Configure NuGet credentials
         run: |
           sed -i 's/MyName/${{ github.actor }}/g' nuget.config
-          sed -i 's/MyPAT/${{ secrets.BUILD }}/g' nuget.config
+          sed -i 's/MyPAT/${{ secrets.GITHUB_TOKEN }}/g' nuget.config
 
       - name: Restore dependencies
         run: dotnet restore "${{github.workspace}}/my-web-app.sln" --verbosity detailed
