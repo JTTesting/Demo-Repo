@@ -50,6 +50,10 @@ jobs:
         run: dotnet test "${{github.workspace}}/my-web-app.sln" --no-restore --logger:"junit;LogFilePath=${{ github.workspace }}/Testresults/test-results.xml"
 
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{github.event.repository.name}}
 
       # create a test summary markdown file
       # if you don't specify an output file, it will automatically add
@@ -78,11 +82,6 @@ jobs:
         with:
           name: ${{github.event.repository.name}}
           path: mywebapp/**
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{github.event.repository.name}}
 
         
   pause-for-approval:
