@@ -70,7 +70,9 @@ jobs:
           cat "${{ github.workspace }}/Testresults/summary.md" >> $GITHUB_STEP_SUMMARY
         if: always()
 
-        
+      - name: List workspace contents
+        run: ls -R
+  
       - name: Save build artifacts
         uses: actions/upload-artifact@v4
         with:
