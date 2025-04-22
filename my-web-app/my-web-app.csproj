@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibDemo" Version="1.0.5" />
+    <PackageReference Include="LibDemo" Version="1.0.5" Condition="'$(BUILD_ENVIRONMENT)' != 'Local'" />
+    <Reference Include="LibDemo" Condition="'$(BUILD_ENVIRONMENT)' == 'Local'">
+      <HintPath>..\..\Libraries\LibDemo\LibDemo\bin\Debug\net8.0\LibDemo.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
