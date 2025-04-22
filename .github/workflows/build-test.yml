@@ -82,7 +82,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: download-artifacts
 
         
   pause-for-approval:
