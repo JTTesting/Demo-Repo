@@ -94,29 +94,31 @@ jobs:
             curl -L -o jq.exe https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe
             mkdir -p C:\jq
             move jq.exe C:\jq\jq.exe
-            set PATH=C:\jq;%PATH%
+            $env:PATH = "C:\jq;" + $env:PATH
       
         - name: Verify jq Installation
           run: jq --version
     
         - name: Checking for Merge
           run: |
-            PULL_REQUEST_NUMBER=${{github.event.number}}
-            OWNER=${{github.actor}}
-            REPO=${{github.event.repository.name}}
-            TOKEN=${{secrets.GITHUB_TOKEN}}
-            while true; do
-              STATUS=$(curl -H "Authorization: token $TOKEN" \
-                            -H "Accept: application/vnd.github.v3+json" \
-                            https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_REQUEST_NUMBER | jq -r .merged)
-              if [[ $STATUS == "true" ]]; then
-                echo "Pull request is merged. Continuing workflow..."
+            $PULL_REQUEST_NUMBER = ${{ github.event.number }}
+            $OWNER = ${{ github.actor }}
+            $REPO = ${{ github.event.repository.name }}
+            $TOKEN = ${{ secrets.GITHUB_TOKEN }}
+            while ($true) {
+              $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_REQUEST_NUMBER" -Headers @{
+                Authorization = "token $TOKEN"
+                Accept = "application/vnd.github.v3+json"
+              }
+              $status = $response | Select-Object -ExpandProperty merged
+              if ($status -eq $true) {
+                Write-Host "Pull request is merged. Continuing workflow..."
                 break
-              else
-                echo "Pull request not yet merged. Waiting..."
-                sleep 60 # Wait 60 seconds before checking again
-              fi
-            done
+              } else {
+                Write-Host "Pull request not yet merged. Waiting..."
+                Start-Sleep -Seconds 60
+              }
+            }
 
   
   Publish:
