@@ -108,7 +108,7 @@ jobs:
 
   
   Publish:
-    needs: build
+    needs: pause-for-approval
     runs-on: windows-2019
     
     steps:
@@ -124,7 +124,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{github.event.repository.name}}
+          name: "${{github.event.repository.name}}-DEV"
+          path: mywebapp/**
+          if-no-files-found: error          
           
       - name: Save build artifact
         uses: actions/upload-artifact@v4
