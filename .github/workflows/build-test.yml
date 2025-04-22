@@ -94,7 +94,7 @@ jobs:
             curl -L -o jq.exe https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe
             mkdir -p C:\jq
             move jq.exe C:\jq\jq.exe
-            set PATH=C:\jq;%PATH%
+            $env:PATH = "C:\jq;" + $env:PATH
       
         - name: Verify jq Installation
           run: jq --version
