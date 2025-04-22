@@ -138,17 +138,10 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: "${{github.event.repository.name}}-DEV"
+          name: "${{github.event.repository.name}}"
           path: mywebapp/**
           if-no-files-found: error          
           
-      - name: Save build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: "${{github.event.repository.name}}-DEV"
-          path: mywebapp/**
-          if-no-files-found: error
-
       - name: Publish
         run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
           
