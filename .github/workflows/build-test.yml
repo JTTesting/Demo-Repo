@@ -22,6 +22,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up cache for build
+        uses: actions/cache@v3
+        with:
+          path: mywebapp/**
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4.1.0
         with:
@@ -62,15 +70,70 @@ jobs:
           cat "${{ github.workspace }}/Testresults/summary.md" >> $GITHUB_STEP_SUMMARY
         if: always()
 
-      - name: Publish
-        run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
+        
+      - name: Save build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: mywebapp/**
 
-      - name: Upload build artifact
+        
+  pause-for-approval:
+    needs: build
+    runs-on: windows-2019
+
+    steps:
+        - name: Install jq
+          run: sudo apt-get update && sudo apt-get install -y jq
+    
+        - name: Checking for Merge
+          run: |
+            PULL_REQUEST_NUMBER=${{github.event.number}}
+            OWNER=${{github.actor}}
+            REPO=${{github.event.repository.name}}
+            TOKEN=${{secrets.GITHUB_TOKEN}}
+            while true; do
+              STATUS=$(curl -H "Authorization: token $TOKEN" \
+                            -H "Accept: application/vnd.github.v3+json" \
+                            https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_REQUEST_NUMBER | jq -r .merged)
+              if [[ $STATUS == "true" ]]; then
+                echo "Pull request is merged. Continuing workflow..."
+                break
+              else
+                echo "Pull request not yet merged. Waiting..."
+                sleep 60 # Wait 60 seconds before checking again
+              fi
+            done
+
+  
+  Publish:
+    needs: build
+    runs-on: windows-2019
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore cache for build
+        uses: actions/cache@v3
+        with:
+          path: mywebapp/**
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          
+      - name: Save build artifact
         uses: actions/upload-artifact@v4
         with:
           name: "${{github.event.repository.name}}-DEV"
           path: mywebapp/**
           if-no-files-found: error
+
+      - name: Publish
+        run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
           
       - name: Dump GitHub context2
         env:
