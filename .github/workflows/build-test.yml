@@ -49,12 +49,6 @@ jobs:
       - name: Test
         run: dotnet test "${{github.workspace}}/my-web-app.sln" --no-restore --logger:"junit;LogFilePath=${{ github.workspace }}/Testresults/test-results.xml"
 
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{github.event.repository.name}}
-
       # create a test summary markdown file
       # if you don't specify an output file, it will automatically add
       # as a job summary. If you specify an output file, you have to
@@ -78,10 +72,11 @@ jobs:
 
         
       - name: Save build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{github.event.repository.name}}
+          name: "${{github.event.repository.name}}-DEV"
           path: mywebapp/**
+          if-no-files-found: error
 
         
   pause-for-approval:
