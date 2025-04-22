@@ -102,7 +102,7 @@ jobs:
         - name: Checking for Merge
           run: |
             $PULL_REQUEST_NUMBER = ${{ github.event.number }}
-            $OWNER = "${{ github.actor }}"
+            $OWNER = "${{ github.event.organization.login }}"
             $REPO = "${{ github.event.repository.name }}"
             $TOKEN = "${{ secrets.GITHUB_TOKEN }}"
             while ($true) {
