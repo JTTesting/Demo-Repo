@@ -72,6 +72,9 @@ jobs:
 
       - name: List workspace contents
         run: ls -R
+
+      - name: Publish
+        run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
   
       - name: Save build artifacts
         uses: actions/upload-artifact@v4.6.0
