@@ -102,9 +102,9 @@ jobs:
         - name: Checking for Merge
           run: |
             $PULL_REQUEST_NUMBER = ${{ github.event.number }}
-            $OWNER = ${{ github.actor }}
-            $REPO = ${{ github.event.repository.name }}
-            $TOKEN = ${{ secrets.GITHUB_TOKEN }}
+            $OWNER = "${{ github.actor }}"
+            $REPO = "${{ github.event.repository.name }}"
+            $TOKEN = "${{ secrets.GITHUB_TOKEN }}"
             while ($true) {
               $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_REQUEST_NUMBER" -Headers @{
                 Authorization = "token $TOKEN"
