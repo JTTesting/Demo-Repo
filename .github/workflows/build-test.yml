@@ -84,7 +84,7 @@ jobs:
           if-no-files-found: error
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4.6.0
+        uses: actions/download-artifact@v4.6.2
         with:
           name: "${{github.event.repository.name}}"
           path: mywebapp/**
@@ -143,7 +143,7 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4.6.0
+        uses: actions/download-artifact@v4.6.2
         with:
           name: "${{github.event.repository.name}}"
           path: mywebapp/**
