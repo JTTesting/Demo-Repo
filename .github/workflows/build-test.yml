@@ -149,9 +149,6 @@ jobs:
           path: mywebapp/
           if-no-files-found: error          
           
-      - name: Publish
-        run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
-          
       - name: Dump GitHub context2
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
