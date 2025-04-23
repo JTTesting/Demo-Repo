@@ -25,10 +25,10 @@ jobs:
       - name: Set up cache for build
         uses: actions/cache@v3
         with:
-          path: mywebapp/**
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: "${{github.workspace}}"
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-nuget-
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4.1.0
@@ -132,8 +132,8 @@ jobs:
       - name: Restore cache for build
         uses: actions/cache@v3
         with:
-          path: mywebapp/**
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: "${{github.workspace}}"
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v3
