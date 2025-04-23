@@ -80,8 +80,15 @@ jobs:
         uses: actions/upload-artifact@v4.6.0
         with:
           name: "${{github.event.repository.name}}"
-          path: mywebapp/**
+          path: mywebapp/
           if-no-files-found: error
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.2.1
+        with:
+          name: "${{github.event.repository.name}}"
+          path: mywebapp/
+          if-no-files-found: error  
 
         
   pause-for-approval:
@@ -136,10 +143,10 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4.6.0
+        uses: actions/download-artifact@v4.2.1
         with:
           name: "${{github.event.repository.name}}"
-          path: mywebapp/**
+          path: mywebapp/
           if-no-files-found: error          
           
       - name: Publish
