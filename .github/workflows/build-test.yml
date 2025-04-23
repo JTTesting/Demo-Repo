@@ -83,6 +83,13 @@ jobs:
           path: mywebapp/**
           if-no-files-found: error
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.6.0
+        with:
+          name: "${{github.event.repository.name}}"
+          path: mywebapp/**
+          if-no-files-found: error  
+
         
   pause-for-approval:
     needs: build
