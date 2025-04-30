@@ -22,6 +22,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up cache for build
+        uses: actions/cache@v3
+        with:
+          path: "${{github.workspace}}"
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4.3.1
         with:
@@ -62,18 +70,87 @@ jobs:
           cat "${{ github.workspace }}/Testresults/summary.md" >> $GITHUB_STEP_SUMMARY
         if: always()
 
+      - name: List workspace contents
+        run: ls -R
+
       - name: Publish
         run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+  
+      - name: Save build artifacts
+        uses: actions/upload-artifact@v4.6.0
         with:
-          name: "${{github.event.repository.name}}-DEV"
-          path: mywebapp/**
+          name: "${{github.event.repository.name}}"
+          path: mywebapp/
           if-no-files-found: error
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.2.1
+        with:
+          name: "${{github.event.repository.name}}"
+          path: mywebapp/
+          if-no-files-found: error  
+
+        
+  pause-for-approval:
+    needs: build
+    runs-on: windows-2019
+
+    steps:
+        - name: Download jq
+          run: |
+            curl -L -o jq.exe https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe
+            mkdir -p C:\jq
+            move jq.exe C:\jq\jq.exe
+            $env:PATH = "C:\jq;" + $env:PATH
+      
+        - name: Verify jq Installation
+          run: jq --version
+    
+        - name: Checking for Merge
+          run: |
+            $PULL_REQUEST_NUMBER = ${{ github.event.number }}
+            $OWNER = "${{ github.event.organization.login }}"
+            $REPO = "${{ github.event.repository.name }}"
+            $TOKEN = "${{ secrets.GITHUB_TOKEN }}"
+            while ($true) {
+              $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_REQUEST_NUMBER" -Headers @{
+                Authorization = "token $TOKEN"
+                Accept = "application/vnd.github.v3+json"
+              }
+              $status = $response | Select-Object -ExpandProperty merged
+              if ($status -eq $true) {
+                Write-Host "Pull request is merged. Continuing workflow..."
+                break
+              } else {
+                Write-Host "Pull request not yet merged. Waiting..."
+                Start-Sleep -Seconds 60
+              }
+            }
+
+  
+  Publish:
+    needs: pause-for-approval
+    runs-on: windows-2019
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore cache for build
+        uses: actions/cache@v3
+        with:
+          path: "${{github.workspace}}"
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.2.1
+        with:
+          name: "${{github.event.repository.name}}"
+          path: mywebapp/
+          if-no-files-found: error          
           
       - name: Dump GitHub context2
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
-
+        if: always()
