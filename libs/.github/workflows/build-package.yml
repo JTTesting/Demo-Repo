@@ -1,0 +1,187 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+env:
+  BUILD_ENVIRONMENT: GitHub
+  
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+        if: always()
+
+      - name: Check file location
+        run: |
+          $csprojPath = "D:\a\${{github.event.repository.name}}\${{github.event.repository.name}}"
+          cd $csprojPath
+          dir
+          cd ..
+          dir
+          cd ..
+          dir
+
+      - name: Extract Version from .csproj
+        id: extract_version
+        run: |
+          # Replace 'YourProject.csproj' with the actual .csproj filename
+          $csprojPath = ".\${{github.event.repository.name}}\${{github.event.repository.name}}.csproj"
+          [xml]$csproj = Get-Content $csprojPath
+          $version = $csproj.Project.PropertyGroup.Version
+          echo "Version: $version"
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Query NuGet API
+        shell: powershell
+        run: |
+          $OWNER = "${{github.repository_owner}}" # Replace with your GitHub username or organization
+          $REPO = "${{github.event.repository.name}}" # Replace with your repository name
+          $VERSION_TO_CHECK = "$env:VERSION" # Replace with your package name
+          $TOKEN = "${{ secrets.GITHUB_TOKEN }}" # Use GitHub token
+          $API_URL = "https://api.github.com/orgs/$OWNER/packages/nuget/$REPO/versions"
+          $response = Invoke-RestMethod -Uri $API_URL -Headers @{
+            Authorization = "token $TOKEN"
+            Accept = "application/vnd.github.v3+json"
+          }
+          $response | ForEach-Object { Write-Host "Version: $($_.name)" }
+          if ($response.name -contains $VERSION_TO_CHECK) {
+            Write-Host "Version $VERSION_TO_CHECK already exists for ${{github.event.repository.name}}."
+            exit 1
+          } else {
+            Write-Host "Version $VERSION_TO_CHECK is available for publishing."
+          }
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Configure NuGet credentials
+        run: |
+          sed -i 's/MyName/${{ github.actor }}/g' nuget.config
+          sed -i 's/MyPAT/${{ secrets.GITHUB_TOKEN }}/g' nuget.config
+
+      - name: Restore dependencies
+        run: dotnet restore "${{github.workspace}}/${{github.event.repository.name}}.sln"
+
+      - name: Build
+        run: dotnet build "${{github.workspace}}/${{github.event.repository.name}}.sln"  --no-restore --configuration Release
+
+      - name: Publish
+        run: dotnet publish "${{github.workspace}}/${{github.event.repository.name}}/${{github.event.repository.name}}.csproj" -c Release -o libdemo
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{github.event.repository.name}}"
+          path: ${{github.event.repository.name}}/**
+          if-no-files-found: error
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.2.1
+        with:
+          name: "${{github.event.repository.name}}"
+          path: ${{github.event.repository.name}}
+          if-no-files-found: error
+
+  pause-for-approval:
+    needs: build
+    runs-on: windows-2019
+
+    steps:
+        - name: Download jq
+          run: |
+            curl -L -o jq.exe https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe
+            mkdir -p C:\jq
+            move jq.exe C:\jq\jq.exe
+            $env:PATH = "C:\jq;" + $env:PATH
+      
+        - name: Verify jq Installation
+          run: jq --version
+    
+        - name: Checking for Merge
+          run: |
+            $PULL_REQUEST_NUMBER = ${{ github.event.number }}
+            $OWNER = "${{ github.event.organization.login }}"
+            $REPO = "${{ github.event.repository.name }}"
+            $TOKEN = "${{ secrets.GITHUB_TOKEN }}"
+            while ($true) {
+              $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_REQUEST_NUMBER" -Headers @{
+                Authorization = "token $TOKEN"
+                Accept = "application/vnd.github.v3+json"
+              }
+              $status = $response | Select-Object -ExpandProperty merged
+              if ($status -eq $true) {
+                Write-Host "Pull request is merged. Continuing workflow..."
+                break
+              } else {
+                Write-Host "Pull request not yet merged. Waiting..."
+                Start-Sleep -Seconds 60
+              }
+            }
+
+  
+  Publish:
+      needs: pause-for-approval
+      runs-on: windows-2019
+      
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+  
+        - name: Restore cache for build
+          uses: actions/cache@v4
+          with:
+            path: "${{github.workspace}}"
+            key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
+  
+        - name: Download build artifacts
+          uses: actions/download-artifact@v4.2.1
+          with:
+            name: "${{github.event.repository.name}}"
+            path: ${{github.event.repository.name}}/
+            if-no-files-found: error          
+
+        - name: Extract Version from .csproj
+          id: extract_version
+          run: |
+            # Replace 'YourProject.csproj' with the actual .csproj filename
+            $csprojPath = ".\${{github.event.repository.name}}\${{github.event.repository.name}}.csproj"
+            [xml]$csproj = Get-Content $csprojPath
+            $version = $csproj.Project.PropertyGroup.Version
+            echo "Version: $version"
+            echo "VERSION=$version" >> $env:GITHUB_ENV
+              
+        - name: Dump GitHub context2
+          env:
+            GITHUB_CONTEXT: ${{ toJSON(github) }}
+          run: echo "$GITHUB_CONTEXT"
+          if: always()
+
+        - name: List workspace contents
+          run: ls -R
+  
+        - name: Configure NuGet credentials
+          run: |
+            sed -i 's/MyName/${{ github.actor }}/g' nuget.config
+            sed -i 's/MyPAT/${{ secrets.GITHUB_TOKEN }}/g' nuget.config
+          
+        - name: Publish NuGet Package
+          run: dotnet nuget push "${{github.workspace}}\${{github.event.repository.name}}\bin\Release\${{github.event.repository.name}}.$env:VERSION.nupkg" --source "${{github.repository_owner}}"  
