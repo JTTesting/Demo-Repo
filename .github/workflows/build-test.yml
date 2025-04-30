@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v4.1.0
+        uses: actions/setup-dotnet@v4.3.1
         with:
           dotnet-version: "8.0.x"
 
@@ -77,14 +77,14 @@ jobs:
         run: dotnet publish "${{github.workspace}}/my-web-app/my-web-app.csproj" -c Release -o mywebapp
   
       - name: Save build artifacts
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: "${{github.event.repository.name}}"
           path: mywebapp/
           if-no-files-found: error
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4.2.1
+        uses: actions/download-artifact@v4.3.0
         with:
           name: "${{github.event.repository.name}}"
           path: mywebapp/
@@ -143,7 +143,7 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/package-lock.json') }}
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4.2.1
+        uses: actions/download-artifact@v4.3.0
         with:
           name: "${{github.event.repository.name}}"
           path: mywebapp/
