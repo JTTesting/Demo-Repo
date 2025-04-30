@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using LibDemo;
+using LibDemo1;
 namespace my_web_app.Pages;
 
 public class IndexModel : PageModel
@@ -20,8 +20,8 @@ public class IndexModel : PageModel
 
     static string Lib(string txt)
     {
-        LibClass Lib = new LibClass(txt);
-        return Lib.GetMessage();
+        LibClass1 Lib = new LibClass1(txt);
+        return Lib.GetMessage1();
     }
 
     public string message = Lib("Bringing in the text");
